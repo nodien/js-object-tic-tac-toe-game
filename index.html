@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Caro</title>
+    <style>
+        #board {
+            position: relative;
+            width: 800px;
+            height: 800px;
+            border: 2px solid black;
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            position: absolute;
+            font-size: 24px;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+        #resetBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<h2>Game Cờ Caro</h2>
+<div id="board"></div>
+<button id="resetBtn">Reset</button>
+<script>
+    const size = 20;
+    const cellSize = 40;
+    const board = document.getElementById("board");
+    const boardArray = [];
+    let currentPlayer = "X";
+    let gameOver = false;
+
+    function createBoard() {
+        board.innerHTML = "";
+        boardArray.length = 0;
+        for (let i = 0; i < size; i++) {
+            boardArray[i] = [];
+            for (let j = 0; j < size; j++) {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                cell.style.left = j * cellSize + "px";
+                cell.style.top = i * cellSize + "px";
+                board.appendChild(cell);
+                boardArray[i][j] = "";
+                cell.addEventListener("click", function () {
+                    if (cell.textContent === "" && !gameOver) {
+                        boardArray[i][j] = currentPlayer;
+                        cell.textContent = currentPlayer;
+                        if (checkWin(i, j)) {
+                            alert(currentPlayer + " wins!");
+                            gameOver = true;
+                            return;
+                        }
+                        currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    }
+                });
+            }
+        }
+    }
+
+    function checkWin(row, col) {
+        return (
+            countConsecutive(row, col, 0, 1) + countConsecutive(row, col, 0, -1) >= 4 ||
+            countConsecutive(row, col, 1, 0) + countConsecutive(row, col, -1, 0) >= 4 ||
+            countConsecutive(row, col, 1, 1) + countConsecutive(row, col, -1, -1) >= 4 ||
+            countConsecutive(row, col, 1, -1) + countConsecutive(row, col, -1, 1) >= 4
+        );
+    }
+
+    function countConsecutive(row, col, rowDir, colDir) {
+        let count = 0;
+        let i = row + rowDir;
+        let j = col + colDir;
+        while (i >= 0 && i < size && j >= 0 && j < size && boardArray[i][j] === currentPlayer) {
+            count++;
+            i += rowDir;
+            j += colDir;
+        }
+        return count;
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        currentPlayer = "X";
+        gameOver = false;
+        createBoard();
+    });
+
+    createBoard();
+</script>
+</body>
+</html>
